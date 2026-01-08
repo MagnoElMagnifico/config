@@ -221,6 +221,20 @@ config.keys = {
     }
   },
 
+  -- Launch yazi in a new tab
+  { mods = 'ALT', key = 'y', action = act.SpawnCommandInNewTab {
+      label = 'Open yazi in a new tab',
+      args = { 'yazi' },
+    }
+  },
+
+  -- Launch yazi in a split pane
+  { mods = 'ALT', key = 'Y', action = act.SplitPane {
+      direction = 'Right',
+      command = { label = 'Run yazi in a split pane', args = { 'yazi' }},
+    }
+  },
+
   -- Font resize
   { mods = 'CTRL', key = '+', action = act.IncreaseFontSize },
   { mods = 'CTRL', key = '-', action = act.DecreaseFontSize },
