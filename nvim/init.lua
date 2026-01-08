@@ -3,7 +3,7 @@
 --   - Keep dependencies to a minimum, while keeping a full editing experience:
 --
 --          Lazy          Automatic installs and updates for plugins
---          Mason         The same for third-party tools (LSPs)
+--          >>> Mason         The same for third-party tools (LSPs) <<<
 --
 --          Treesitter    Better highlighting
 --          LSP           Faster navigation, inline errors
@@ -89,22 +89,22 @@ vim.opt.rtp:prepend(lazypath)
 -- This is modular, comment out what you don't need
 
 -- Builtin configuration
-require 'options'      -- Most basic settings
-require 'keymaps'      -- Basic keybindings
-require 'commands'     -- Auto-commands and user commands
---require 'netrw'        -- Netrw configuration (deprecated by mini.files)
+require 'options'  -- Most basic settings
+require 'keymaps'  -- Basic keybindings
+require 'commands' -- Auto-commands and user commands
+--require 'netrw'  -- Netrw configuration (deprecated by mini.files)
+require 'lsp'      -- Language Server mappings, autocommands configuration
 
 -- Third party plugins
 require('lazy').setup({
-  require 'completion',
-  require 'format',
-  require 'git',
-  require 'looks',
-  require 'lsp',
-  require 'mini_config',
-  require 'telescope_config',
-  require 'terminal',
-  require 'treesitter',
+  require 'completion',       -- blink
+  require 'format',           -- conform
+  require 'git',              -- gitsigns, [neogit]
+  require 'looks',            -- onedark, dracula, tokyonight, indent-blankline, todo-comments
+  require 'mini_config',      -- mini.ai, mini.surround, mini.align, mini.bracketed, mini.files, mini.statusline
+  require 'telescope_config', -- telescope, dependencies: {plenary, telescope-fzf-native}
+  require 'terminal',         -- toggleterm
+  require 'treesitter',       -- nvim-treesitter
 
   -- Detect tabstop and shiftwidth automatically (alternative to 'tpope/vim-sleuth')
   -- Command ':GuessIndent'
@@ -115,5 +115,5 @@ require('lazy').setup({
 ---- CONFIGURED COLORSCHEME ---------------------------------------------------
 -- Preferred builtin colorchemes:  habamax, slate, sorbet, unokai
 -- Third party:                    onedark, drakula, sonokai, tokyonight
-vim.cmd.colorscheme 'sonokai'
+vim.cmd.colorscheme 'onedark'
 

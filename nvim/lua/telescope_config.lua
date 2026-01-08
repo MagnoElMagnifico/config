@@ -133,19 +133,14 @@ return {
 
       ---- CUSTOM -------------------------------------------------------------
       -- Fuzzy find lines in the current buffer
-      nmap('<leader>/', function()
-        builtin.current_buffer_fuzzy_find(themes.get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, 'Search current buffer')
+      nmap('<leader>/', builtin.current_buffer_fuzzy_find, 'Search current buffer')
 
       -- Fuzzy find lines in all opened buffers
       nmap('<leader>s/', function()
-        builtin.live_grep(themes.get_dropdown {
+        builtin.live_grep {
           grep_open_files = true,
           prompt_title = 'Live Grep in open Files',
-        })
+        }
       end, 'Search in Open Files')
 
       -- Shortcut for searching Neovim configuration files

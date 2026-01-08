@@ -5,7 +5,7 @@ return {
     lazy = false,
     priority = 1000,
     -- dark, darker, cool, deep, warm, warmer, light
-    opts = { style = 'darker' }
+    opts = { style = 'dark' }
   },
 
    -- :colorscheme drakula, drakula-soft
