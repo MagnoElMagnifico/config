@@ -10,6 +10,10 @@ set -gx MANPAGER less
 set -gx PAGER less
 
 # PATH
+if test -d $HOME/.local/bin
+    fish_add_path $HOME/.local/bin
+end
+
 if test -d $HOME/.cargo/bin
     fish_add_path $HOME/.cargo/bin
 end
