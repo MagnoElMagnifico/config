@@ -1,3 +1,26 @@
+# ==== Override jump sizes ====
+[[mgr.prepend_keymap]]
+desc = "Move cursor down"
+on = "<C-d>"
+run = "arrow 5"
+
+[[mgr.prepend_keymap]]
+desc = "Move cursor up"
+on = "<C-u>"
+run = "arrow -5"
+
+# Scroll
+[[mgr.prepend_keymap]]
+desc = "Scroll down"
+on = "<C-f>"
+run = "arrow 50%"
+
+[[mgr.prepend_keymap]]
+desc = "Scroll up"
+on = "<C-b>"
+run = "arrow -50%"
+
+
 # ==== Other locations ====
 [[mgr.prepend_keymap]]
 desc = "Cd to ~/Uni"
