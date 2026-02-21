@@ -21,9 +21,8 @@
 local enabled_servers = {
   'clangd',
   'zuban',
-  -- 'pylsp',
-  -- 'ols',
-  -- 'rust_analyzer',
+  'ols',
+  'rust_analyzer',
 }
 
 ---- LSP KEYMAPS --------------------------------------------------------------
@@ -285,7 +284,7 @@ vim.lsp.config("*", {
 
 ---- Configuration for each LSP server ----
 -- C/C++ language server
--- Fedora package: clang-devel
+-- Fedora package: clang-devel or clang-tools-extra
 vim.lsp.config['clangd'] = {
   cmd = { 'clangd', '--background-index' },
   filetypes = { 'c', 'cpp' },
@@ -293,72 +292,16 @@ vim.lsp.config['clangd'] = {
 }
 
 -- Python language server
--- This is technically a framework, the functionality is implemented via plugins:
--- - Jedi: autocompletion, go to definition, type inference, static analysis...
---   Written in Python (https://jedi.readthedocs.io/)
--- - Ruff: linter and formatter written in Rust (https://docs.astral.sh/ruff/)
--- Fedora package: python3-lsp-server python-lsp-ruff
--- TODO: remove
-vim.lsp.config['pylsp'] = {
-  cmd = { 'pylsp', '-v', '--log-file', '/tmp/pylsp.log' },
-  filetypes = { 'python' },
-  root_markers = {
-    'pyproject.toml',
-    'setup.py',
-    'setup.cfg',
-    'requirements.txt',
-    'Pipfile',
-    '.git',
-  },
-  settings = {
-    pylsp = {
-      plugins = {
-        ruff = { enabled = true, },
-        -- disable not installed plugins
-        autopep8    = { enabled = false, },
-        flake8      = { enabled = false, },
-        mccabe      = { enabled = false, },
-        pycodestyle = { enabled = false, },
-        pydocstyle  = { enabled = false, },
-        pyflakes    = { enabled = false, },
-        pylint      = { enabled = false, },
-        rope        = { enabled = false, },
-        yapf        = { enabled = false, },
-      },
-    },
-  },
-}
-
--- Python language server
 -- Website: https://zubanls.com/
---
--- Installation:
---    python3 -m venv .venv
---    source .venv/bin/activate
---    pip install --upgrade pip
---    pip install zubanls
--- TODO: Does not work with locally installed libraries (numpy, requests...)
+-- Installation: pipx install zubanls
 vim.lsp.config['zuban'] = {
-  cmd = { '/home/magno/Uni/TavernNet/test/.venv/bin/zuban', 'server' },
+  cmd = { 'zuban', 'server' },
   filetypes = { 'python' },
   root_markers = { '.git', 'pyproject.toml', 'setup.py' }
 }
 
-
---[[ TODO: tinymist for typst
--- Website: https://myriad-dreamin.github.io/tinymist/introduction.html
--- cargo install --git https://github.com/Myriad-Dreamin/tinymist --locked tinymist-cli
-vim.lsp.config["tinymist"] = {
-    cmd = { "tinymist" },
-    filetypes = { "typst" },
-    settings = {
-        -- ...
-    }
-}]]
-
-
 -- Rust language server
--- rustup component add rust-analyzer
+-- Installation: rustup component add rust-analyzer
 vim.lsp.config['rust_analyzer'] = {
   cmd = { 'rust-analyzer' },
   filetypes = { 'rust' },
@@ -371,7 +314,7 @@ vim.lsp.config['rust_analyzer'] = {
 }
 
 -- Odin language server
--- git clone https://github.com/DanielGavin/ols && ./build.sh
+-- Installation: git clone https://github.com/DanielGavin/ols && ./build.sh
 vim.lsp.config['ols'] = {
   cmd = { 'ols' },
   filetypes = { 'odin' },
@@ -385,6 +328,11 @@ vim.lsp.config['ols'] = {
     },
   },
 }
+
+-- LanguageTool (spell and grammar checking)
+-- Website: https://ltex-plus.github.io/ltex-plus/index.html
+-- Instalation: manually from Github Releases (https://github.com/ltex-plus/ltex-ls-plus/releases)
+-- Info: https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ltex_plus.lua
 
 -- Finally, do a call to 'vim.lsp.enable' with the name of the servers.
 vim.lsp.enable(enabled_servers)
