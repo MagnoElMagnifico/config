@@ -12,24 +12,30 @@ shopt -s globstar       # use ** for recursive wildcard
 
 bind "set completion-ignore-case on"
 
+### ENV ###
+# History control
+export HISTCONTROL=ignoredups:erasedups
+export HISTSIZE=1000
+export HISTFILESIZE=2000
+
 ### PROMPT ###
-# Using Nerd Fonts: "<current directory> $ " all in green
+# "<current directory> $ " all in green
 export PS1=$'\[\033[1;32m\]\W $ \[\033[0m\]'
 
 ### ALIAS ###
-alias   ..='cd ..'
-alias  ...='cd ../..'
-alias ....='cd ../../..'
-alias   .4='cd ../../../..'
-alias   .5='cd ../../../../..'
+alias  ..='cd ..'
+alias ...='cd ../..'
+alias  .3='cd ../../..'
+alias  .4='cd ../../../..'
+alias  .5='cd ../../../../..'
 
 # Prefered format and colors
-alias grep='grep --color=always'
-alias ls='ls --color=always --group-directories-first -hv'
+alias grep='grep --color=auto'
+alias ls='ls --color=auto --group-directories-first -hv'
 alias ip='ip --color=auto'
-alias diff='diff --color=always -u'
-alias less='less -R'
-alias df='df -h'
+alias diff='diff --color=auto -u'
+alias less='less -Ri'
+alias df='df -hi'
 alias ll='ls -l'
 alias la='ls -lA'
 
@@ -42,18 +48,13 @@ alias rm='rm -iv'
 alias mv='mv -iv'
 alias cp='cp -iv'
 
-### FUZZY STUFF ###
-
-cdf() {
-    cd $(find $1 -type d -not -path '*/[@.]*' | fzf)
+### FUNCTIONS ###
+function notes {
+    local file=$(fd -tf -e md -e typ . ~/notes | fzf --preview "bat --plain --color=always {}")
+    if [[ -n "$file" ]]; then
+        pushd ~/notes >/dev/null && nvim "$file" && popd > /dev/null
+    fi
 }
-
-dvim() {
-    cdf $1 && nvim .
-}
-
-# Fuzzy find
-alias fvim='nvim $(fzf)'
 
 # Run fastfetch on startup if:
 #   - the command exists
