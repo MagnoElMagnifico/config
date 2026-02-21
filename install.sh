@@ -12,49 +12,66 @@ By Magno El Magnífico
 
 EOF
 
+SCRIPT=$(realpath "$0")
+DOTDIR=$(dirname "$SCRIPT")
+ASSUME_YES=false
+while getopts "y" opt; do
+    case $opt in
+        y) ASSUME_YES=true ;;
+        *) echo "Uso: $0 [-y]"; exit 1 ;;
+    esac
+done
+
 # $1 Program name
 # $2 src: file/directory
 # $3 dst: file (if source is a file)
 #         parent directory (if the source is a directory)
 function create_link {
-    printf     "[+] $1: $2 -> $3\n"
-    read -e -p "    Create link? [y/N] "
-    if ! [[ "$REPLY" == [Yy]* ]]; then
-        return 1
-    fi
+    local name="$1"
+    local src="$2"
+    local dst="$3"
 
-    # Check if already exists
-    if [ -e $3 ]; then
-        read -e -p "    $2 already exists, want to overwrite? [y/N] "
+    # Create parent directory if it does not exist
+    mkdir -p "$(dirname "$dst")"
 
-        if [[ "$REPLY" == [Yy]* ]]; then
-            # ln cannot overwrite directories
-            if [ -d $3 ]; then
-                rm --dir $3
-            fi
-            ln -sf $2 $3
-        else
-            printf "Skipping..."
+    # Ask the user to continue
+    if [ "$ASSUME_YES" = false ]; then
+        printf     "[+] $name: $src -> $dst\n"
+        read -e -p "    Create link? [y/N] "
+        if ! [[ "$REPLY" =~ ^[Yy]$ ]]; then
+            return 1
         fi
-    else
-        ln -s $2 $3
     fi
 
+    # Check if a file/directory (not link) already exists 
+    if [[ -e "$dst" && ! -L "$dst" ]]; then
+        # Ask the user to overwrite
+	read -e -p "    $dst already exists, want to overwrite? (data will be lost!) [y/N] "
+        if ! [[ "$REPLY" =~ ^[Yy]$ ]]; then
+	    return 1
+        fi
+	rm -rf "$dst"
+    fi
+    ln -sfn "$src" "$dst"
     return 0
 }
 
-SCRIPT=$(realpath "$0")
-DOTFILES_DIR=$(dirname "$SCRIPT")
+create_link "Environment variables" \
+    $DOTDIR/env/10-variables.conf \
+    $HOME/.config/environment.d/10-variables.conf && \
+    echo "Log into new session to apply changes"
 
-create_link "User dirs" $DOTFILES_DIR/user-dirs.dirs $HOME/.config/user-dirs.dirs
-create_link "bashrc"    $DOTFILES_DIR/bash/bashrc    $HOME/.bashrc
-create_link "profile"   $DOTFILES_DIR/bash/profile   $HOME/.profile
-create_link "fish"      $DOTFILES_DIR/fish           $HOME/.config/fish
-create_link "Neovim"    $DOTFILES_DIR/nvim           $HOME/.config/nvim
-create_link "Git"       $DOTFILES_DIR/gitconfig      $HOME/.gitconfig
-create_link "Yazi"      $DOTFILES_DIR/yazi           $HOME/.config/yazi
-create_link "tmux"      $DOTFILES_DIR/tmux.conf      $HOME/.tmux.conf
-create_link "Wezterm"   $DOTFILES_DIR/wezterm        $HOME/.config/wezterm
+create_link "User dirs" \
+    $DOTDIR/env/user-dirs.dirs \
+    $HOME/.config/user-dirs.dirs && \
+    xdg-user-dirs-update
 
-# create_link "Helix"     $DOTFILES_DIR/helix          $HOME/.config/helix
-# create_link "VS Codium" $DOTFILES_DIR/VSCodium/settings.json $HOME/.config/VSCodium/User/settings.json
+create_link "bashrc"       "$DOTDIR/bash/bashrc"  "$HOME/.bashrc"
+create_link "bash_profile" "$DOTDIR/bash/profile" "$HOME/.bash_profile"
+create_link "fish"         "$DOTDIR/fish"         "$HOME/.config/fish"
+create_link "Neovim"       "$DOTDIR/nvim"         "$HOME/.config/nvim"
+create_link "Git"          "$DOTDIR/git"          "$HOME/.config/git"
+create_link "Yazi"         "$DOTDIR/yazi"         "$HOME/.config/yazi"
+create_link "tmux"         "$DOTDIR/tmux"         "$HOME/.config/tmux"
+create_link "Wezterm"      "$DOTDIR/wezterm"      "$HOME/.config/wezterm"
+# create_link "Helix"        "$DOTDIR/helix"        "$HOME/.config/helix"
