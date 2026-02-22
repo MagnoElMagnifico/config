@@ -1,5 +1,5 @@
 {
-  "Code block": {
+  "Code Block": {
     "prefix": "code",
     "description": "Create a code block with a specific language",
     "body": [
@@ -9,16 +9,26 @@
     ]
   },
 
+  "Command Block": {
+    "prefix": "cmd",
+    "description": "Create a code block with Bash language",
+    "body": [
+      "```bash",
+      "$0",
+      "```"
+    ]
+  },
+
   "Simple Template": {
     "prefix": "template",
     "description": "Create basic Latex-like article template",
     "body": [
-      "#set text(lang: \"es\", size: 10pt)",
       "#set document(",
       "\ttitle: \"$1\",",
       "\tauthor: \"$2\",",
       "\tdate: datetime.today(),",
       ")",
+      "#set text(lang: \"es\", size: 10pt)",
       "#set page(margin: 1.75in, numbering: \"1\")",
       "#set heading(numbering: \"1.\")",
       "#set par(",
@@ -33,16 +43,67 @@
       "#show outline.entry: it => pad(x: 0.5cm, it)",
       "#show raw.where(block: true): it => pad(left: 1cm, text(size: 8pt, it))",
       "#show raw: set text(font: \"Fira Code\")",
+      "#show selector.or(table, image): set align(center)",
+      "#show table: set par(justify: false)",
       "",
       "#align(center)[",
       "\t#text(25pt, weight: \"bold\")[$1]",
       "",
-      "\t#text(16pt, smallcaps[$2])",
-      "",
+      "\t#text(16pt, smallcaps[$2]) \\",
       "\t#datetime.today().display(\"[day]/[month]/[year]\")",
       "]",
       "",
       "$0"
+    ]
+  },
+
+  "Callout Block": {
+    "prefix": "#let-callout",
+    "description": "Insert definition of callout block",
+    "body": [
+      "#let callout(title: [Nota], stroke: 1.5pt + black, inset: 14pt, body) = block(",
+      "\tbreakable: false,",
+      "\tabove: 2em, stroke: stroke,",
+      "\twidth: 100%, inset: inset,",
+      ")[",
+      "\t#place(",
+      "\t\ttop + left,",
+      "\t\tdy: -6pt - inset,",
+      "\t\tdx: 6pt - inset,",
+      "\t\tblock(fill: white, inset: 2pt, strong(smallcaps(title)))",
+      "\t)",
+      "\t#body",
+      "]"
+    ]
+  },
+
+  "Abstract Block": {
+    "prefix": "#let-abstract",
+    "description": "Insert definition of abstract block",
+    "body": [
+      "#let abstract(body) = pad(x: 1cm, {",
+      "\talign(center)[*Objetivos*]",
+      "\temph(body)",
+      "})"
+    ]
+  },
+
+  "Definition Block": {
+    "prefix": "#let-def",
+    "description": "Insert definition of definition block",
+    "body": [
+      "#show figure.where(kind: \"def\"): it => {",
+      "\tset align(left)",
+      "\tcallout(title: it.caption, it.body)",
+      "}",
+      "#let def(what, body) = figure(",
+      "\tbody,",
+      "\tkind: \"def\",",
+      "\tsupplement: [Definición],",
+      "\tnumbering: \"1\",",
+      "\toutlined: true,",
+      "\tcaption: what,",
+      ")"
     ]
   }
 }
