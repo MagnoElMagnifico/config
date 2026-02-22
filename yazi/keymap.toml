@@ -23,19 +23,24 @@ run = "arrow -50%"
 
 # ==== Other locations ====
 [[mgr.prepend_keymap]]
-desc = "Cd to ~/Uni"
+desc = "Cd to ~/uni"
 on   = [ "g", "u" ]
-run  = "cd ~/Uni"
+run  = "cd ~/uni"
 
 [[mgr.prepend_keymap]]
-desc = "Cd to dotfiles"
+desc = "Cd to ~/prog"
+on   = [ "g", "p" ]
+run  = "cd ~/prog"
+
+[[mgr.prepend_keymap]]
+desc = "Cd to config"
 on   = [ "g", "." ]
-run  = "cd ~/Prog/dotfiles"
+run  = "cd ~/config"
 
 [[mgr.prepend_keymap]]
-desc = "Cd to magnofiles"
-on   = [ "g", "m" ]
-run  = "cd /media/magno/magnofiles/"
+desc = "Cd to archive"
+on   = [ "g", "a" ]
+run  = "cd ~/archive"
 
 # ==== Other navigations ====
 [[mgr.prepend_keymap]]
