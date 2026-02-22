@@ -1,3 +1,8 @@
+# Set environment variables overwritten in the system's bash configuration from
+# ~/.config/environment.d/
+export EDITOR="nvim"
+export PATH="$HOME/.local/bin:$HOME/.local/share/cargo/bin:$PATH"
+
 # Load ~/.bashrc if it exists
 # The script already handles login/non-login sessions
 [[ -f ~/.bashrc ]] && . ~/.bashrc

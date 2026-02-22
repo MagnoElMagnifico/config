@@ -3,6 +3,13 @@ if not status is-interactive
     return
 end
 
+#### ENV ####
+# Set environment variables overwritten in the system's bash configuration from
+# ~/.config/environment.d/
+set -gx EDITOR nvim
+fish_add_path "$HOME/.local/share/cargo/bin"
+fish_add_path "$HOME/.local/bin"
+
 #### ALIASES ####
 # Navigation
 alias ..='cd ..'
