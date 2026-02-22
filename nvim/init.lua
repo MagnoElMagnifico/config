@@ -113,7 +113,8 @@ require('lazy').setup({
 })
 
 ---- CONFIGURED COLORSCHEME ---------------------------------------------------
--- Preferred builtin colorchemes:  habamax, slate, sorbet, unokai
+-- Preferred builtin colorchemes:  habamax, sorbet, unokai
 -- Third party:                    onedark, drakula, sonokai, tokyonight
+-- Light themes:                   tokyonight-day, onelight
 vim.cmd.colorscheme 'onedark'
 

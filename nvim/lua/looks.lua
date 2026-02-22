@@ -1,11 +1,14 @@
 return {
   ---- COLORSCHEMES -----------------------------------------------------------
+  -- :colorscheme onedark
+  -- :colorscheme onelight
+  -- :colorscheme onedark_vivid
+  -- :colorscheme onedark_dark
+  -- :colorscheme vaporware
   {
-    'navarasu/onedark.nvim',
+    'olimorris/onedarkpro.nvim',
     lazy = false,
     priority = 1000,
-    -- dark, darker, cool, deep, warm, warmer, light
-    opts = { style = 'dark' }
   },
 
    -- :colorscheme drakula, drakula-soft

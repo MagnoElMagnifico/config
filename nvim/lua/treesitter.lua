@@ -50,64 +50,20 @@ return {
     -- This is only run then, not every time Neovim starts up.
     build = ':TSUpdate', -- Must update parsers at the same time
 
-    opts = {
-      ensure_installed = {
-        'bash',
-        'c',
-        'cpp',
-        'diff',
-        'html',
-        'java',
-        'latex',
-        'lua',
-        'luadoc',
-        'markdown',
-        'odin',
-        'python',
-        'rust',
-        'typst',
-        'vim',
-        'vimdoc',
-      },
-
-      -- Autoinstall languages that are not installed, some can be ignored with
-      -- 'ignore_install = {...}'.
-      -- They will be installed in '~/.local/share/nvim/lazy/nvim-treesitter/parser'
-      -- but can be changed with 'parser_install_dir'
-      auto_install = true,
-
-      ---- MODULES ------------------------------------------------------------
-      -- Consistent syntax highlighting functionalities, even with modifications
-      -- or errors (as you're typing). The traditional method just uses regex.
-      highlight = {
-        enable = true,
-
-        -- Disable in big files
-        disable = function(_, bufnr)
-          local max_filesize = 100 * 1024 -- 100 KiB
-          local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(bufnr))
-          return ok and stats and stats.size > max_filesize
-        end,
-      },
-
-      -- Indentation based on tree-sitter for the '=' operator
-      indent = { enable = true },
-
-      -- Incremental selection based on the named nodes from the grammar.
-      incremental_selection = { enable = false },
-
-      -- Syntax aware folding can be enabled with (experimental):
-      --   vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-      --   vim.o.foldtext = 'v:lua.vim.treesitter.foldtext()'
-    },
-
     config = function(_, opts)
-      -- Prefer git instead of curl in order to improve connectivity in some
-      -- environments
-      require('nvim-treesitter.install').prefer_git = true
+      local filetypes = {
+        'bash', 'c', 'cpp', 'java', 'odin', 'rust', 'python',
+        'html', 'markdown', 'typst',
+        'lua', 'luadoc',
+        'vim', 'vimdoc',
+        'diff',
+      }
 
-      -- Now apply the configuration
-      require('nvim-treesitter.configs').setup(opts)
+      require('nvim-treesitter').install(filetypes)
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = filetypes,
+        callback = vim.treesitter.start,
+      })
     end,
   }, -- treesitter
 } -- return

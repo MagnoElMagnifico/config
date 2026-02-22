@@ -88,8 +88,7 @@ vim.o.foldlevel = 99   -- No folds closed by default (set to 0 to close all)
 vim.o.foldnestmax = 4  -- Max fold nesting
 
 -- Disable providers
-vim.g.python_host_skip_check = 0
-vim.g.loaded_python_provider = 0
+vim.g.loaded_python3_provider = 0
 vim.g.loaded_node_provider = 0
 vim.g.loaded_ruby_provider = 0
 vim.g.loaded_perl_provider = 0
