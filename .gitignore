@@ -1,2 +1,5 @@
 nvim/plugin
 nvim/lazy-lock.json
+git/credentials
+fish/fish_variables
+.directory

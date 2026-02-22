@@ -1,0 +1,152 @@
+#### CLI ######################################################################
+# required
+ripgrep       # faster grep
+fzf           # fuzzy finder
+fastfetch     # faster neofetch
+yazi          # TUI file manager [cargo]
+bat           # cat with syntax highlighting
+fd-find       # faster find
+
+# general tools
+tokei         # better cloc
+moreutils     # sponge, ts, combine, chronic...
+rsync         # sync files
+tealdeer      # quick docs
+hunspell      # interactive spell check
+
+# networking tools
+traceroute
+tcpdump
+nmap
+
+# file tools
+jq                  # JSON tool
+perl-Image-ExifTool # metadata tool
+poppler-utils       # PDF utils
+tesseract           # OCR (reads text from images)
+pandoc              # converts between text file formats
+ffmpeg              # video/image/audio processing [rpmfusion]
+ImageMagick         # image processing
+yt-dlp              # youtube video download
+
+# extra (optional) tools
+btop?         # better top/htop
+iotop-c?      # top/htop for IO operations
+pastel?       # colors tool
+entr?         # run commands on file changes
+
+
+#### Development ##############################################################
+# main tools
+wezterm       # terminal [copr, flatpak, appimage, rpm, manual]
+fish          # friendly-interactive shell (non POSIX)
+neovim        # THE editor
+git           # THE version control system
+docker        # containers [own repo]
+tmux          # terminal multiplexer
+
+# C/C++
+@c-development    # gcc g++ gdb make configure autoconf...
+clang             # clang compiler and LLVM toolchain
+clang-tools-extra # clangd & clang-format
+
+# python
+python  # python interpreter
+pipx    # package manager for python programs
+    mdformat mdformat-gfm mdformat-frontmatter # markdown formatter
+    sembr?   # semantic line breaks
+    watson?  # time tracker
+    zuban    # Python LSP
+
+# rust
+rustup  # rust installer [script]
+
+# odin
+odin    # [manual, homebrew]
+ols     # odin language server [manual, homebrew]
+
+# other
+godot                     # game engine [manual (single executable)]
+typst                     # latex alternative [manual (typst update), cargo, homebrew]
+hugo                      # static site generator
+java-latest-openjdk-devel # java
+golang?
+
+#### GUI ######################################################################
+# browsers
+firefox       # (primary)
+brave-browser # (secondary) [own repo]
+
+# Extensions:
+# - uBlock Origin
+# - Dark Reader
+# - LeechBlock NG
+
+# applications that I use (install when they are needed)
+megasync      # cloud sync [own repo]
+calibre       # book library manager
+obsidian      # modern note taking app [flatpak]
+VirtualBox    # type 2 hypervisor [rpmfusion]
+
+inkscape      # vector graphics editor
+krita         # drawing application
+gimp          # image editing
+rnote?        # sketching, hand-drawing [flatpak]
+
+libreoffice   # office suite
+thunderbird?  # email and chat client
+obs-studio?   # video recording
+blender?      # 3D
+kdenlive?     # video editor
+
+
+#### Fedora KDE Minimal #######################################################
+
+# select in the installer
+@core                      # smallest possible instalation
+@networkmanager-submodules # NetworkManager for wifi and bluetooth
+
+# minimal system (groups)
+@standard                  # common utils: tar, zip, wget, rsync, file, hundspell...
+@hardware-support          # firmware
+@multimedia                # audio/video: pipewire, pipewire-pulseaudio, wireplumber, alsa-utils (?)
+@fonts                     # common fonts
+@base-x                    # graphics drivers for desktop
+
+# desktop environment base packages
+sddm            # login screen
+sddm-kcm        # allows configuration of the login screen in KDE
+sddm-breeze
+
+plasma-desktop           # the actual desktop
+plasma-workspace-wayland # wayland support for KDE
+plasma-nm                # KDE network applet
+kwallet                  # KDE password store
+pam-kwallet              # unlocks kwallet on login
+kscreen                  # multimonitor setup
+kinfocenter              # system information
+
+# required extras
+bluedevil              # bluetooth
+cups                   # required for printing
+plasma-print-manager   # GUI for printers
+xdg-desktop-portal-kde # required for flatpak's apps integration
+akmod-nvidia           # NVIDIA drivers [rpmfusion]
+glibc-all-langpacks    # more languages
+
+# applications from the desktop environment
+flatpak              # install more apps
+konsole              # terminal
+plasma-systemmonitor # system monitor
+dolphin              # file manager
+kwrite               # GUI text editor
+spectacle            # screenshots
+mpv                  # video/audio player
+ark                  # archiver tool
+okular               # document viewer
+gwenview             # image viewer
+filelight            # find large files
+elisa-player         # music player
+skanpage             # document scanner
+kamoso               # webcam
+
