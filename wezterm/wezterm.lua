@@ -20,16 +20,29 @@ config.command_palette_font_size = 10
 
 -- TODO: colors when highlight text on copy/search mode
 -- https://gogh-co.github.io/Gogh/
--- https://terminal.sexy/
+-- https://leaysgur.github.io/wezterm-colorscheme/
 --
--- Themes:
---   - Dracula (Gogh)
---   - Monokai Soda (Gogh)
---   - Sonokai (Gogh)
---   - Spacegray (Gogh)
---   - Sweet Eliverlara (Gogh)
---   - Ayu Mirage (Gogh)
-config.color_scheme = 'Sonokai (Gogh)'
+--
+-- Really dark:
+--   - Monokai              [green cursor]
+--   - Monokai Soda (Gogh)  [okay contrast]
+--   - Atom
+--
+-- Middle:
+--   - OneDark (base16)         [perfect dark]
+--   - Sweet Eliverlara (Gogh)  [saturated with contrast]
+--   - Humanoid dark (base16)   [not so dark]
+--   - Breeze (Gogh)            [very dark]
+--
+--   - Sonokai (Gogh)           [orange]
+--   - Dracula (Gogh)           [saturated]
+--   - Dehydration (Gogh)       [warmer colors]
+--
+-- Light:
+--   - One Light (base16)        [white chars as black]
+--   - Catppuccin Latte (Gogh)
+--   - Github Light (Gogh)
+config.color_scheme = 'OneDark (base16)'
 
 config.enable_scroll_bar = false
 config.use_fancy_tab_bar = false
