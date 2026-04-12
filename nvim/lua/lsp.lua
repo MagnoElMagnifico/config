@@ -15,8 +15,15 @@
 -- information to you.
 --
 -- Since Neovim 0.11, the API is easier to use and LSPs can be setup natively
--- with almost no boilerplate code. See below for more information.
+-- with almost no boilerplate code.
 --
+-- 
+-- Note: some LSP features are disabled by default, you can enable them
+-- manually:
+-- - lsp-codelens
+-- - lsp-linked_editing_range
+-- - lsp-inlay_hint
+-- - lsp-inline_completion
 
 local enabled_servers = {
   'clangd',
@@ -36,6 +43,34 @@ local function keymaps(buffer, client)
   end
 
   local tl = require 'telescope.builtin'
+
+  -- GLOBAL:
+  -- gra   code action
+  -- gri   implementation
+  -- grn   rename
+  -- grr   references
+  -- grt   type definitions
+  -- grx   codelens.run()
+  -- gO    document symbols
+  -- <C-s> signature help (insert)
+  -- gx    document link
+  -- an in selection range (visual) (if treesitter is not active)
+  --
+  -- BUFFER:
+  -- K    hover
+  --
+  -- omnifunc: vim.lsp.omnifunc()
+  -- tagfunc: gd :tjump, <C-]> <C-w>] <C-w>}
+  -- formatexpr: gq
+  --
+  -- 
+  --
+  -- :lsp enable [config]
+  -- :lsp disable [config]
+  -- :lsp restart [client]
+  -- :lsp stop [client]
+  --
+  -- diagnostics
 
   ---- Actions ----
   map('grn', vim.lsp.buf.rename, 'Rename symbol under cursor')
@@ -64,6 +99,10 @@ local function keymaps(buffer, client)
   map('[d', function() vim.diagnostic.jump { count = 1, float = true } end, 'Go to previous Diagnostic message')
   map(']d', function() vim.diagnostic.jump { count =-1, float = true } end, 'Go to next Diagnostic message')
 
+--      vim.keymap.set("n", "<leader>td", function()
+--        vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+--      end, { desc = "Toggle diagnostics" })
+
   ---- Other ----
   -- tl.lsp_incoming_calls
   -- tl.lsp_outgoing_calls
@@ -89,6 +128,7 @@ local function commands(buffer, client)
   end, { desc = 'Opens the Nvim LSP client log.' })
 
   ---- LSP START ----
+  -- TODO: no necesario por :lsp enable [config] ?
   vim.api.nvim_create_user_command('LspStart', function(info)
     local servers = info.fargs
 
@@ -113,6 +153,7 @@ local function commands(buffer, client)
   })
 
   ---- LSP RESTART ----
+  -- TODO: no necesario por :lsp restart [config] ?
   vim.api.nvim_create_user_command('LspRestart', function(info)
     local client_names = info.fargs
 
@@ -159,6 +200,7 @@ local function commands(buffer, client)
   })
 
   ---- LSP STOP ----
+  -- TODO: no necesario por :lsp stop [config] ?
   vim.api.nvim_create_user_command('LspStop', function(info)
     local client_names = info.fargs
 
@@ -336,4 +378,3 @@ vim.lsp.config['ols'] = {
 
 -- Finally, do a call to 'vim.lsp.enable' with the name of the servers.
 vim.lsp.enable(enabled_servers)
-

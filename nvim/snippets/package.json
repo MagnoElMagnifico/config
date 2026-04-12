@@ -1,9 +1,0 @@
-{
-  "name": "personal-snippets",
-  "contributes": {
-    "snippets": [
-      { "language": "typst", "path": "./typst.json" },
-      { "language": "markdown", "path": "./markdown.json" }
-    ]
-  }
-}

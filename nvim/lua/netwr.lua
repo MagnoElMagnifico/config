@@ -32,10 +32,11 @@ map('n', '<Leader>ee', vim.cmd.Explore,  'Launch Explorer')
 map('n', '<Leader>ev', vim.cmd.Lexplore, 'Toggle Explorer in new Vertical split')
 map('n', '<Leader>et', vim.cmd.Texplore, 'Launch Explorer in new Tab')
 
-map('n', '<Leader>ec',
+map(
+  'n',
+  '<Leader>ec',
   function()
     vim.cmd('Explore ' .. vim.fn.getcwd())
   end,
   'Launch Explorer in CWD'
 )
-
