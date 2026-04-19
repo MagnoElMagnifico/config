@@ -114,7 +114,6 @@
 --
 -- INLAY HINTS
 --   vim.lsp.inlay_hint.enable(true)    adds virtual text with extra information (parameter names, type info, etc)
---   ===> Mapped to <leader>li
 --
 -- CLIENT LIFECYCLE
 --   vim.lsp.start(config)              start a client manually
@@ -134,6 +133,16 @@
 -- FOLDING (set in window options)
 --   vim.lsp.foldexpr()     use as: vim.wo.foldexpr = 'v:lua.vim.lsp.foldexpr()'
 --   vim.lsp.foldtext()     use as: vim.wo.foldtext  = 'v:lua.vim.lsp.foldtext()'
+
+-------------------------------------------------------------------------------
+---- CUSTOM BINDINGS ----------------------------------------------------------
+-------------------------------------------------------------------------------
+
+local function keymaps(buffer)
+    -- I don't like the default behaviour of gd and gD
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition', silent = true, buffer = buffer })
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, { desc = 'Go to declaration', silent = true, buffer = buffer })
+end
 
 
 -------------------------------------------------------------------------------
@@ -214,6 +223,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
       return
     end
 
+    -- Custom buffer-local keymaps
+    keymaps(event.buf)
+
     -- Highlight symbol under cursor.
     -- First, check if this is functionality is provided by the LSP Server.
     if client and client.server_capabilities.documentHighlightProvider then
@@ -222,14 +234,14 @@ vim.api.nvim_create_autocmd('LspAttach', {
       -- See `:help CursorHold`.
       local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
       vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-        buffer = buffer,
+        buffer = event.buf,
         group = highlight_augroup,
         callback = function() vim.lsp.buf.document_highlight() end,
       })
 
       -- When you move your cursor, the highlights will be cleared.
       vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-        buffer = buffer,
+        buffer = event.buf,
         group = highlight_augroup,
         callback = function() vim.lsp.buf.clear_references() end,
       })
@@ -327,7 +339,7 @@ vim.diagnostic.config {
   jump  = { float = true }, -- Auto open the float after jumping
 }
 
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list', silent = true })
+vim.keymap.set('n', 'grd', vim.diagnostic.setqflist, { desc = 'Open diagnostic Quickfix list', silent = true })
 vim.keymap.set('n', 'gl', vim.diagnostic.open_float, { desc = 'Open diagnostic', silent = true })
 
 

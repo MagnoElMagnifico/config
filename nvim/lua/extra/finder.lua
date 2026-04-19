@@ -70,6 +70,14 @@ nmap('<leader>m', fzf.marks,       'Search and jump to Marks')
 nmap('<leader>r', fzf.registers,   'Search and paste Registers')
 nmap('<leader>/', fzf.grep_curbuf, 'Search current buffer')
 
+-- LSP: under <leader>l
+nmap('<leader>ll',  fzf.lsp_finder,     'All LSP locations related to the symbol under cursor')
+nmap('<leader>lr',  fzf.lsp_references, 'Search LSP references of symbol under cursor')
+nmap('<leader>ls',  fzf.lsp_document_symbols, 'Search LSP document symbols') -- file outline
+nmap('<leader>lw',  fzf.lsp_live_workspace_symbols, 'Search all LSP symbols')
+nmap('<leader>ld',  fzf.lsp_document_diagnostics, 'Search LSP diagnostics')
+nmap('<leader>lD',  fzf.lsp_workspace_diagnostics, 'Search LSP workspace diagnostics')
+
 -- Extra: under <leader>s
 nmap('<leader>.',  fzf.resume,     'Resume last search')
 nmap('<leader>ss', fzf.builtin,    'Search available selectors')
