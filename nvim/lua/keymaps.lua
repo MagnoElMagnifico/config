@@ -15,11 +15,11 @@ map({'n', 'v', 'o'}, ';', ',', 'Repeat f, F, t, T in the opposite direction')
 map({'n', 'v'}, 'go', '<C-^>', 'Alternate file') -- Similar to 'gt'
 
 ---- Convenient keymaps ----
+map('i', 'jk', '<Esc>', 'Exit Insert Mode')
 map('n', 'U', '<C-R>', 'Redo')
 map('v', 'p', 'P', "Don't overwrite yanked text with the selected content")
 map('n', 'gV', '`[v`]', 'Select pasted text') -- analogous to gv
 map('n', 'J', 'mzJ`z', 'Join lines and keep cursor position')
-map('n', '<Esc>', '<cmd>nohlsearch<Enter>', 'Clear highlightings') -- TODO: is there something better for this?
 map('t', '<Esc>', '<C-\\><C-n>', 'Exit terminal')
 
 -- Stay in visual mode after indenting

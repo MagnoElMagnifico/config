@@ -8,9 +8,9 @@ vim.opt.colorcolumn = {100} -- Vertical line at 100 characters
 -- Indentation
 vim.opt.autoindent = true
 vim.opt.smartindent = true
-vim.opt.shiftwidth = 2
+vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
-vim.opt.tabstop = 2
+vim.opt.tabstop = 4
 
 -- Search
 vim.opt.smartcase = true -- Search case insensitive, unless searching uppercase
@@ -18,6 +18,7 @@ vim.opt.ignorecase = true -- Required for 'smartcase' to work
 vim.opt.incsearch = true -- Update search live
 vim.opt.inccommand = 'nosplit' -- Show in the current window, no previews
 vim.opt.hlsearch = true -- Highlight matches
+vim.opt.updatetime = 3000 -- For the nohlsearch plugin
 
 -- Window settings
 vim.opt.scrolloff = 10
@@ -61,7 +62,6 @@ vim.opt.textwidth = 100
 -- j  Remove comment leader when joining lines
 vim.o.formatoptions = 'tcro/qnlj'
 
--- TODO: ???
 -- %n Buffer number
 -- %< Truncate text here if no there isn't enough space
 -- %f Filename
@@ -73,6 +73,8 @@ vim.o.formatoptions = 'tcro/qnlj'
 -- %= Separator
 -- %l,%c-%V Position inside de file
 -- %P Percentaje inside the file
+--
+-- NOTE: This will be overwritten by mini.statusline, but it's kept as a fallback
 vim.opt.statusline = '[%n] %<%f %h%q%w%r%m%=%-14.(%l,%c%V%) %P'
 vim.opt.showmode = false -- Current mode will be in the status line
 

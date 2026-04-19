@@ -1,5 +1,30 @@
 -------------------------------------------------------------------------------
 --
+-- FEATURES:
+--
+--     Treesitter    Better highlighting
+--     LSP           Go to definition, errors & diagnostics
+--     completion    Documentation, faster typing, no typos
+--     snippets      Writing faster
+--     Fuzzy finder  Jump to files and locations easily
+--     Gitsigns      Git status and hunk management
+--     Mini.nvim     AI              -- tree-sitter operators
+--                   Align, Surround -- automate tedious tasks
+--                   Bracketed       -- easy navigation (conflict markers for git)
+--                   Files           -- netrw moving and coping is annoying
+--                   IndentScope     -- show current scope
+--                   Statusline      -- prettier status line
+--     GuessIndent   Avoid having to do `:set sw=4 et` every time
+--     Colorschemes  Onedark
+--
+-- TODO:
+--
+--   - Formatting    Consistent format and avoid tedious tasks
+--   - ToggleTerm    Faster terminal handling
+--   - todo-comments Highlight TODO comments and similar
+--
+-------------------------------------------------------------------------------
+--
 -- CONFIGURATION RULES:
 --
 --   - Keep dependencies to a minimum, while keeping a full editing experience.
@@ -20,84 +45,104 @@ vim.g.loaded_node_provider = 0
 
 -- Disable builtin plugins
 -- See which ones are being loaded with :scriptnames
---vim.g.loaded_netrw = 1
---vim.g.loaded_netrwPlugin = 1
-vim.g.loaded_tutor_mode_plugin = 1
-vim.g.loaded_zip = 1
-vim.g.loaded_zipPlugin = 1
-vim.g.loaded_tar = 1
-vim.g.loaded_tarPlugin = 1
-vim.g.loaded_gzip = 1
+-- TODO: decide which ones to remove
+--vim.g.loaded_tutor_mode_plugin = 1
+--vim.g.loaded_zip = 1
+--vim.g.loaded_zipPlugin = 1
+--vim.g.loaded_tar = 1
+--vim.g.loaded_tarPlugin = 1
+--vim.g.loaded_gzip = 1
 
 -- Must be set before plugins
 vim.g.mapleader = ' '
 
+-------------------------------------------------------------------------------
+---- Core options and configuration -------------------------------------------
+-------------------------------------------------------------------------------
 
+-- This is modular, comment out what you don't need
+require 'options'  -- Most basic settings
+require 'keymaps'  -- Basic keybindings
+require 'commands' -- General auto-commands and user commands
+require 'lsp'      -- Language Server mappings, autocommands and configuration
 
-require 'options'
-require 'keymaps'
-require 'commands'
-require 'netwr'
--- TODO: revisar LSPs + comandos
+-------------------------------------------------------------------------------
+---- Builtin plugins configuration --------------------------------------------
+-------------------------------------------------------------------------------
 
-if vim.fn.has('nvim-0.12') == 1 then
-  -- Experimental
-  -- No me gusta que sea bloqueante, no se puede usar para compilar
-  require('vim._core.ui2').enable()
+-- Experimental UI for the command line.
+--  - Commands syntax highlighting
+--  - Use g< to reopen the output
+--  - The window behaves like a normal buffer
+local ok, ui2 = pcall(require, 'vim._core.ui2')
+if ok then ui2.enable() end
+
+-- Builtin file explorer: don't use if mini.files is available
+if package.searchpath('mini.files', package.path) then
+  vim.g.loaded_netrw = 1
+  vim.g.loaded_netrwPlugin = 1
+else
+  require 'netwr'
 end
 
--- Treesitter    Better highlighting
--- LSP           Faster navigation, inline errors
--- completion    Documentation, faster typing, no typos
--- snippets      Writing faster
--- Formatting    Consistent format and avoid tedious tasks
--- ToggleTerm    Faster terminal handling
--- Telescope     Jump files easily
--- Try https://github.com/ibhagwan/fzf-lua instead
--- Gitsigns      Git status and hunk management
--- Mini.nvim     AI              -- tree-sitter operators
---               Align, Surround -- automate tedious tasks
---               Bracketed       -- easy navigation (conflict markers for git)
---               Files           -- netrw moving and coping is annoying
---               Statusline      -- prettier status line
---
--- GuessIndent   Avoid having to do `:set sw=4 et` every time
---               Maybe replaceable with .editorconfig
---
--- Looks (opt)   Colorschemes: onedark, drakula, sonokai, tokyonight
---               Todo-comments: highlight special comments
---               Indent-blanklines
---               render-markdown.nvim
---
---
--- :Lazy         ???
--- :Lazy check   Check for updates (git fetch)
--- :Lazy update  Updates all the installed plugins (updates lockfile)
--- :Lazy clean   Delete plugins no longer needed
--- :Lazy restore Goes back to the version of the lockfile
---
--- Plugins are installed in the following directories, so to remove lazy.nvim,
--- you can just delete them.
---
---    data      ~/.local/share/nvim/lazy/
---    state     ~/.local/state/nvim/lazy/
---    lockfile  ~/.config/nvim/lazy-lock.json
---
--- Equivalent????
---
---vim.pack.add {
---  ''
---}
+-- Hides search highlights after 'updatetime' of inactivity
+-- or entering Insert Mode.
+vim.cmd.packadd 'nohlsearch'
 
--- TODO: revisar que es esto
--- Ver :h plugins
--- vim.cmd.packadd('cfilter')
--- vim.cmd.packadd('nvim.undotree')
--- vim.cmd.packadd('nvim.difftool')
+-- TODO: undotree
+--vim.cmd.packadd 'undotree'
 
----- CONFIGURED COLORSCHEME ---------------------------------------------------
+-- TODO: difftool
+--vim.cmd.packadd 'difftool'
+
+-------------------------------------------------------------------------------
+---- Third party plugins configuration ----------------------------------------
+-------------------------------------------------------------------------------
+
+-- TODO: document 'runtimepath' and configuration files
+
+vim.pack.add({
+  -- Plugins
+  'https://github.com/ibhagwan/fzf-lua',
+  'https://github.com/lewis6991/gitsigns.nvim',
+  'https://github.com/NMAC427/guess-indent.nvim',
+  'https://github.com/nvim-mini/mini.nvim',
+  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', branch = 'main', build = ':TSUpdate' },
+  { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range('1.x') }, -- Rewritting for V2
+
+  -- setup.style = dark, darker, cool, deep, warm, warmer, light
+  'https://github.com/navarasu/onedark.nvim',
+
+  -- :colorscheme drakula, drakula-soft
+  --'https://github.com/Mofiqul/dracula.nvim',
+  -- vim.g.sonokai_style = default, atlantis, andromeda, shusia, maia, espresso
+  --'https://github.com/sainnhe/sonokai',
+  -- :colorscheme tokyonight tokyonight-night tokyonight-storm tokyonight-day tokyonight-moon
+  --'https://github.com/folke/tokyonight.nvim',
+})
+
+require 'extra.treesitter' -- nvim-treesitter
+require 'extra.finder'     -- fzf-lua
+require 'extra.completion' -- blink
+require 'extra.mini'       -- mini.ai, mini.surround, mini.align, mini.bracketed, mini.files, mini.statusline
+require 'extra.git'        -- gitsigns
+
+local ok, guess = pcall(require, 'guess-indent')
+if ok then
+  guess.setup()
+end
+
+-------------------------------------------------------------------------------
+---- Color scheme -------------------------------------------------------------
+-------------------------------------------------------------------------------
 -- Preferred builtin colorchemes:  habamax, sorbet, unokai
 -- Third party:                    onedark, drakula, sonokai, tokyonight
 -- Light themes:                   tokyonight-day, onelight
---vim.cmd.colorscheme 'onedark'
-
+local ok, onedark = pcall(require, 'onedark')
+if ok then
+  onedark.setup({ style = 'darker' })
+  onedark.load()
+else
+  -- fallback
+  vim.cmd.colorscheme 'habamax'
+end

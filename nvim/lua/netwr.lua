@@ -1,7 +1,3 @@
-local function map(mode, mapping, mapped, desc)
-  vim.keymap.set(mode, mapping, mapped, { desc = desc, silent = true })
-end
-
 ---- Netrw --------------------------------------------------------------------
 -- -   Go to parent directory
 -- %   Create file
@@ -28,15 +24,19 @@ vim.g.netrw_winsize = 20
 vim.g.netrw_sort_sequence = '[\\/]$'
 
 -- More mappings :h netrw-quickhelp
-map('n', '<Leader>ee', vim.cmd.Explore,  'Launch Explorer')
-map('n', '<Leader>ev', vim.cmd.Lexplore, 'Toggle Explorer in new Vertical split')
-map('n', '<Leader>et', vim.cmd.Texplore, 'Launch Explorer in new Tab')
+vim.keymap.set('n', '<Leader>ee', vim.cmd.Explore,  { desc = 'Launch Explorer', silent = true })
+vim.keymap.set('n', '<Leader>ev', vim.cmd.Lexplore, { desc = 'Toggle Explorer in new Vertical split', silent = true })
+vim.keymap.set('n', '<Leader>et', vim.cmd.Texplore, { desc = 'Launch Explorer in new Tab', silent = true })
+vim.keymap.set(
+  'n',
+  '<Leader>ew',
+  function() vim.cmd.Explore(vim.fn.getcwd()) end,
+  { desc = 'Launch Explorer in CWD', silent = true }
+)
 
-map(
+vim.keymap.set(
   'n',
   '<Leader>ec',
-  function()
-    vim.cmd('Explore ' .. vim.fn.getcwd())
-  end,
-  'Launch Explorer in CWD'
+  function() vim.cmd.Explore(vim.fn.stdpath 'config') end,
+  { desc = 'Launch Explorer in Config directory', silent = true }
 )

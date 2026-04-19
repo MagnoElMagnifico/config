@@ -1,6 +1,7 @@
 -------------------------------------------------------------------------------
 ---- LANGUAGE SERVER PROTOCOL -------------------------------------------------
 -------------------------------------------------------------------------------
+--
 -- LSP (Language Server Protocol) is a protocol that standardizes how editors
 -- and language tooling communicate.
 --
@@ -14,259 +15,195 @@
 -- communicate using an agreed-upon protocol in order to display that
 -- information to you.
 --
--- Since Neovim 0.11, the API is easier to use and LSPs can be setup natively
--- with almost no boilerplate code.
+-- Since Neovim 0.11+, LSP is built-in and required minimal configuration.
+-- Since Neovim 0.12+, native insert-mode auto-completio is also built-in.
 --
--- 
--- Note: some LSP features are disabled by default, you can enable them
--- manually:
--- - lsp-codelens
--- - lsp-linked_editing_range
--- - lsp-inlay_hint
--- - lsp-inline_completion
-
-local enabled_servers = {
-  'clangd',
-  'zuban',
-  'ols',
-  'rust_analyzer',
-}
-
----- LSP KEYMAPS --------------------------------------------------------------
--- Sets up keymaps for the buffer with an LSP Server attached.
--- These are the default keymaps, see ':h lsp-defaults'.
-local function keymaps(buffer, client)
-
-  local function map(keys, func, desc, mode)
-    mode = mode or 'n'
-    vim.keymap.set(mode, keys, func, { buffer = buffer, desc = 'LSP: ' .. desc })
-  end
-
-  local tl = require 'telescope.builtin'
-
-  -- GLOBAL:
-  -- gra   code action
-  -- gri   implementation
-  -- grn   rename
-  -- grr   references
-  -- grt   type definitions
-  -- grx   codelens.run()
-  -- gO    document symbols
-  -- <C-s> signature help (insert)
-  -- gx    document link
-  -- an in selection range (visual) (if treesitter is not active)
-  --
-  -- BUFFER:
-  -- K    hover
-  --
-  -- omnifunc: vim.lsp.omnifunc()
-  -- tagfunc: gd :tjump, <C-]> <C-w>] <C-w>}
-  -- formatexpr: gq
-  --
-  -- 
-  --
-  -- :lsp enable [config]
-  -- :lsp disable [config]
-  -- :lsp restart [client]
-  -- :lsp stop [client]
-  --
-  -- diagnostics
-
-  ---- Actions ----
-  map('grn', vim.lsp.buf.rename, 'Rename symbol under cursor')
-  map('gra', vim.lsp.buf.code_action, 'Code Action')
-  map('gq',  vim.lsp.buf.format, 'Format with LSP')
-
-  ---- Navigation ----
-  map('grr', tl.lsp_references,                'Goto References of word under cursor')
-  map('gri', tl.lsp_implementations,           'Goto Implementation of word under cursor')
-  map('grt', tl.lsp_type_definitions,          'Goto Type definition under cursor')
-
-  map('gd',  tl.lsp_definitions,               'Goto Definition') -- First declaration, to go back use '<C-t>'
-  map('gD',  vim.lsp.buf.declaration,          'Goto Declaration') -- Jump to header file (not very used)
-  map('gO',  tl.lsp_document_symbols,          'Document symbols')
-  map('gW',  tl.lsp_dynamic_workspace_symbols, 'Workspace symbols')
-
-  map('gs',    vim.lsp.buf.signature_help, 'Function Signature')
-  map('<C-s>', vim.lsp.buf.signature_help, 'Function Signature', 'i')
-
-  ---- Diagnostics ----
-  map('K',          vim.lsp.buf.hover,         'Hover Documentation of symbol under cursor')
-  map('gl',         vim.diagnostic.open_float, 'Open diagnostic in a floating window')
-  map('<Leader>lt', tl.diagnostics,            'Telescope Quickfix diagnostics')
-  map('<leader>ll', vim.diagnostic.setloclist, 'Open all diagnostics in a Location List')
-
-  map('[d', function() vim.diagnostic.jump { count = 1, float = true } end, 'Go to previous Diagnostic message')
-  map(']d', function() vim.diagnostic.jump { count =-1, float = true } end, 'Go to next Diagnostic message')
-
---      vim.keymap.set("n", "<leader>td", function()
---        vim.diagnostic.enable(not vim.diagnostic.is_enabled())
---      end, { desc = "Toggle diagnostics" })
-
-  ---- Other ----
-  -- tl.lsp_incoming_calls
-  -- tl.lsp_outgoing_calls
-
-  -- Toggle inlay hints in code, if the language server you are using supports
-  -- them. This may be unwanted, since they displace some of your code.
-  if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-    map('<Leader>li', function()
-      vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-    end, 'Toggle Inlay Hints')
-  end
-end
-
+--
+-------------------------------------------------------------------------------
+---- MAPPINGS & ACTIONS (default Neovim LSP keymaps) --------------------------
+-------------------------------------------------------------------------------
+--
+---- ACTIONS ------------------------------------------------------------------
+--
+--   gra      code action: fixes/refactors suggested by LSP     vim.lsp.buf.code_action()
+--   grn      rename symbol under cursor across workspace       vim.lsp.buf.rename()
+--   grx      code lens: contextual LSP commands                vim.lsp.codelens.run()
+-- * gq       format selection or buffer via LSP                vim.lsp.buf.format()
+--
+-- (*) Active when 'formatexpr' is set to vim.lsp.formatexpr(),
+-- which is done automatically on attach for the buffer.
+--
+--
+---- NAVIGATION / INFORMATION -------------------------------------------------
+--
+--   buffer:K hover information like docs or type info          vim.lsp.buf.hover()
+--   gri      go to implementation(s) of symbol                 vim.lsp.buf.implementation()
+-- * gd       go to definition                                  vim.lsp.buf.definition()
+-- * gD       go to declaration                                 vim.lsp.buf.declaration()
+--   grt      go to type definition                             vim.lsp.buf.type_definition()
+--   grr      list references to symbol                         vim.lsp.buf.references()
+--   gO       document symbols: outline of current file         vim.lsp.buf.document_symbol()
+--   gx       open document link                                vim.ui.open(), which handles textDocument/documentLink
+--   [NONE]   incoming/outgoing calls                           vim.lsp.buf.incoming_calls()/outgoing_calls()
+--
+-- (*) Active when 'tagfunc' is set to vim.lsp.tagfunc(),
+-- which is done automatically on attach for the buffer.
+--
+-- When a result has multiple locations, a QuickFix/Location List will be used.
+-- Overridde via vim.lsp.handlers.
+--
+-- Symbol navigation concepts:
+--
+-- - Definition:      Where a symbol is actually defined
+-- - Declaration:     Where a symbol is declared in an interface/forward declaration, header, etc.
+-- - Implementation:  Concrete implementation of an interface/abstract method
+-- - Type Definition: Where the TYPE of a symbol is defined, like struct/class/type alias
+--
+--
+---- INSERT MODE --------------------------------------------------------------
+--
+--   <C-s>    signature help: function parameter hints          vim.lsp.buf.signature_help()
+-- * <C-x><C-o> LSP completion source                           -
+--
+-- (*) Active when 'omnifunc' is set to vim.lsp.omnifunc(),
+-- which is automatically on attach for the buffer.
+-- NOTE: In Neovim 0.12+, native auto-completion can replace omnifunc: vim.o.autocomplete = true
+--
+--
+---- SELECT MODE --------------------------------------------------------------
+--
+--   an     select outward structural range (Treesitter or LSP fallback)
+--   in     select inward structural range (Treesitter or LSP fallback)
+--   ]n     select next sibling node
+--   [n     select previous sibling node
+--
+--
+-------------------------------------------------------------------------------
 ---- COMMANDS -----------------------------------------------------------------
--- Stolen from: https://github.com/neovim/nvim-lspconfig/blob/master/plugin/lspconfig.lua
-local function commands(buffer, client)
-  ---- LSP INFO ----
-  vim.api.nvim_create_user_command('LspInfo', 'checkhealth vim.lsp', { desc = 'Run checkhealth vim.lsp' })
+-------------------------------------------------------------------------------
+--
+-- :checkhealth vim.lsp    diagnose LSP setup issues
+-- :lsp enable [config]    activates LSP for current and future buffers     vim.lsp.enable()
+-- :lsp disable [config]   disable LSP
+-- :lsp restart [client]   restart LSP client and server
+-- :lsp stop [client]      stops LSP client and server
+-- :LspLog                 open LSP client log in new tab
+-- :LspInfo                alias to :checkhealth vim.lsp
+--
+--
+-------------------------------------------------------------------------------
+---- CONFIG (0.11+ native API) ------------------------------------------------
+-------------------------------------------------------------------------------
+--
+--   vim.lsp.config('name', opts)   define or extend a server config
+--   vim.lsp.config['name'] = opts  alternative table assignment form
+--   vim.lsp.enable('name')         activate a configured server
+--   vim.lsp.enable({'a','b'})      activate multiple servers
+--
+-- Config files can also be placed in lsp/*.lua and are auto-loaded.
+-- Use the LspAttach autocmd for buffer-local customization on attach.
+--
+-- These configuration options are implemented by 'neovim/nvim-lspconfig'.
+-- Since I am using very few servers, I will do them myself at the end of this file.
+-- However, this repo is useful as a reference.
+--
+--
+-------------------------------------------------------------------------------
+---- OTHER FUNCTIONS ----------------------------------------------------------
+-------------------------------------------------------------------------------
+--
+-- INLAY HINTS
+--   vim.lsp.inlay_hint.enable(true)    adds virtual text with extra information (parameter names, type info, etc)
+--   ===> Mapped to <leader>li
+--
+-- CLIENT LIFECYCLE
+--   vim.lsp.start(config)              start a client manually
+--   vim.lsp.status()                   LSP progress info (useful in statuslines)
+--
+-- WORKSPACE
+--   vim.lsp.buf.workspace_symbol()     search workspace symbols
+--   vim.lsp.buf.add_workspace_folder()
+--   vim.lsp.buf.remove_workspace_folder()
+--   vim.lsp.buf.list_workspace_folders()
+--
+-- HIGHLIGHTING
+--   vim.lsp.buf.document_highlight()   highlight all references to symbol under cursor
+--   vim.lsp.buf.clear_references()     clear those highlights
+-- ==> see function autocomands() later
+--
+-- FOLDING (set in window options)
+--   vim.lsp.foldexpr()     use as: vim.wo.foldexpr = 'v:lua.vim.lsp.foldexpr()'
+--   vim.lsp.foldtext()     use as: vim.wo.foldtext  = 'v:lua.vim.lsp.foldtext()'
 
-  ---- LSP LOG ----
-  vim.api.nvim_create_user_command('LspLog', function()
-      vim.cmd(string.format('tabnew %s', vim.lsp.log.get_filename()))
-  end, { desc = 'Opens the Nvim LSP client log.' })
 
-  ---- LSP START ----
-  -- TODO: no necesario por :lsp enable [config] ?
-  vim.api.nvim_create_user_command('LspStart', function(info)
-    local servers = info.fargs
+-------------------------------------------------------------------------------
+---- CUSTOM COMMANDS ----------------------------------------------------------
+-------------------------------------------------------------------------------
 
-    -- Default to enabling all servers matching the filetype of the current buffer.
-    -- This assumes that they've been explicitly configured through `vim.lsp.config`,
-    -- otherwise they won't be present in the private `vim.lsp.config._configs` table.
-    if #servers == 0 then
-      local filetype = vim.bo.filetype
-      for name, _ in pairs(vim.lsp.config._configs) do
-        local filetypes = vim.lsp.config[name].filetypes
-        if filetypes and vim.tbl_contains(filetypes, filetype) then
-          table.insert(servers, name)
-        end
-      end
-    end
+-- Toggle Inlay Hints
+vim.api.nvim_create_user_command('LspHints', function()
+  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+end, { desc = 'Toggle Inlay Hints' })
 
-    vim.lsp.enable(servers)
-  end, {
-    desc = 'Enable and launch a language server',
-    nargs = '?',
-    complete = function() return enabled_servers end,
-  })
 
-  ---- LSP RESTART ----
-  -- TODO: no necesario por :lsp restart [config] ?
-  vim.api.nvim_create_user_command('LspRestart', function(info)
-    local client_names = info.fargs
+-- Open LSP client log
+vim.api.nvim_create_user_command('LspLog', function()
+  vim.cmd.tabnew(vim.lsp.log.get_filename())
+  local buf = vim.api.nvim_get_current_buf()
 
-    -- Default to restarting all active servers
-    if #client_names == 0 then
-      client_names = vim
-        .iter(vim.lsp.get_clients())
-        :map(function(client)
-          return client.name
-        end)
-        :totable()
-    end
+  vim.bo[buf].readonly   = true
+  vim.bo[buf].modifiable = false
+  vim.bo[buf].filetype   = 'log'   -- enables highlight if nvim-treesitter-log or similar is installed
+  -- jump to the end since the most recent entries are at the bottom
+  vim.cmd.normal('G')
+  vim.keymap.set('n', 'q', vim.cmd.bdel, { buffer = buf, silent = true })
+end, { desc = 'Opens the Nvim LSP client log.' })
 
-    for name in vim.iter(client_names) do
-      if vim.lsp.config[name] == nil then
-        vim.notify(("Invalid server name '%s'"):format(name))
-      else
-        vim.lsp.enable(name, false)
-        if info.bang then
-          vim.iter(vim.lsp.get_clients({ name = name })):each(function(client)
-            client:stop(true)
-          end)
-        end
-      end
-    end
 
-    local timer = assert(vim.uv.new_timer())
-    timer:start(500, 0, function()
-      for name in vim.iter(client_names) do
-        vim.schedule_wrap(vim.lsp.enable)(name)
-      end
-    end)
-  end, {
-    desc = 'Restart the given client',
-    nargs = '?',
-    bang = true,
-    complete = function(arg)
-      return vim
-        .iter(vim.lsp.get_clients())
-        :map(function(client) return client.name end)
-        :filter(function(name) return name:sub(1, #arg) == arg end)
-        :totable()
-    end,
-  })
-
-  ---- LSP STOP ----
-  -- TODO: no necesario por :lsp stop [config] ?
-  vim.api.nvim_create_user_command('LspStop', function(info)
-    local client_names = info.fargs
-
-    -- Default to disabling all servers on current buffer
-    if #client_names == 0 then
-      client_names = vim
-        .iter(vim.lsp.get_clients())
-        :map(function(client)
-          return client.name
-        end)
-        :totable()
-    end
-
-    for name in vim.iter(client_names) do
-      if vim.lsp.config[name] == nil then
-        vim.notify(("Invalid server name '%s'"):format(name))
-      else
-        vim.lsp.enable(name, false)
-        if info.bang then
-          vim.iter(vim.lsp.get_clients({ name = name })):each(function(client)
-            client:stop(true)
-          end)
-        end
-      end
-    end
-  end, {
-    desc = 'Disable and stop the given client',
-    nargs = '?',
-    bang = true,
-    complete = function() return enabled_servers end,
-  })
-end
-
----- LSP AUTOCOMMANDS ---------------------------------------------------------
-local function autocommands(buffer, client)
-  -- The following two autocommands are used to highlight references of the word
-  -- under your cursor when your cursor rests there for a little while.
-  --
-  -- See `:help CursorHold` for information about when this is executed.
-  --
-  -- First, check if this is functionality is provided by the LSP Server.
-  if client and client.server_capabilities.documentHighlightProvider then
-    local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
-    vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-      buffer = buffer,
-      group = highlight_augroup,
-      callback = vim.lsp.buf.document_highlight,
-    })
-
-    -- When you move your cursor, the highlights will be cleared.
-    vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-      buffer = buffer,
-      group = highlight_augroup,
-      callback = vim.lsp.buf.clear_references,
-    })
-
-    -- On exit, clear the references and these autocommands
-    vim.api.nvim_create_autocmd('LspDetach', {
-      group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
-      callback = function(event2)
-        vim.lsp.buf.clear_references()
-        vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
-      end,
-    })
+-- Shows information about the servers attached to the current buffer
+vim.api.nvim_create_user_command('LspInfo', function()
+  local clients = vim.lsp.get_clients({ bufnr = 0 })
+  if #clients == 0 then
+    vim.notify('No LSP clients attached to this buffer', vim.log.levels.WARN)
+    return
   end
-end
+
+  local lines = {}
+  for _, client in ipairs(clients) do
+    table.insert(lines, '--- ' .. client.name .. ' (id: ' .. client.id .. ') ---')
+    table.insert(lines, 'Root:       ' .. (client.root_dir or 'none'))
+    table.insert(lines, 'Command:    ' .. table.concat(client.config.cmd or {}, ' '))
+    table.insert(lines, 'Filetypes:  ' .. table.concat(client.config.filetypes or {}, ', '))
+    table.insert(lines, 'Encoding:   ' .. client.offset_encoding)
+
+    -- which capabilities the server actually supports
+    local caps = client.server_capabilities
+    local supported = {}
+    for cap, val in pairs(caps) do
+      if val then table.insert(supported, cap) end
+    end
+    table.sort(supported)
+    table.insert(lines, 'Capabilities:')
+    for _, cap in ipairs(supported) do
+      table.insert(lines, '  ' .. cap)
+    end
+
+    table.insert(lines, '')
+  end
+
+  -- open in a scratch buffer
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].filetype = 'markdown'
+  vim.cmd.split()
+  vim.api.nvim_win_set_buf(0, buf)
+  vim.keymap.set('n', 'q', vim.cmd.bdel, { buffer = buf, silent = true })
+end, { desc = 'Show LSP information for the current buffer' })
+
+
+-------------------------------------------------------------------------------
+---- LSP AUTOCOMMANDS ---------------------------------------------------------
+-------------------------------------------------------------------------------
 
 -- Create the mappings and autocommands when an LSP is attached
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -277,32 +214,185 @@ vim.api.nvim_create_autocmd('LspAttach', {
       return
     end
 
-    -- The new buffer will have these new keymaps, autocommands and commands
-    keymaps(event.buf, client)
-    autocommands(event.buf, client)
-    commands(event.buf, client)
+    -- Highlight symbol under cursor.
+    -- First, check if this is functionality is provided by the LSP Server.
+    if client and client.server_capabilities.documentHighlightProvider then
+      -- The following two autocommands are used to highlight references of the word
+      -- under your cursor when your cursor rests there for a little while.
+      -- See `:help CursorHold`.
+      local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
+      vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+        buffer = buffer,
+        group = highlight_augroup,
+        callback = function() vim.lsp.buf.document_highlight() end,
+      })
 
+      -- When you move your cursor, the highlights will be cleared.
+      vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+        buffer = buffer,
+        group = highlight_augroup,
+        callback = function() vim.lsp.buf.clear_references() end,
+      })
+
+      -- On exit, clear the references and these autocommands
+      vim.api.nvim_create_autocmd('LspDetach', {
+        group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
+        callback = function(event2)
+          vim.lsp.buf.clear_references()
+          vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
+        end,
+      })
+    end
   end,
 })
 
+
+-------------------------------------------------------------------------------
 ---- DIAGNOSTICS --------------------------------------------------------------
--- These are implemented by 'neovim/nvim-lspconfig'. Since I am using very few
--- servers, I will do them myself. However, this repo is useful as a reference.
+-------------------------------------------------------------------------------
 --
---    :LspInfo     Status of active and configured servers (alias to checkhealth vim.lsp)
---    :LspLog      Open the LSP logfile
---    :LspRestart  Restarts all the servers
+-- The diagnostic framework is independent of LSP: it can receive diagnostics
+-- from any source (LSP servers, linters, static analysis tools, etc.).
 --
--- Diagnostics config ':h vim.diagnostic.Opts'
+-- The API is split between:
+--   PRODUCERS  tools that create and set diagnostics (require a namespace)
+--   CONSUMERS  end-users who read and display them (namespace usually optional)
+--
+-- Severities:
+--
+--   vim.diagnostic.severity.ERROR   (highest priority)
+--   vim.diagnostic.severity.WARN
+--   vim.diagnostic.severity.INFO
+--   vim.diagnostic.severity.HINT    (lowest priority)
+--
+-- Functions accepting {severity} support three filter forms:
+--
+--   Single value:    { severity = sev.WARN }
+--   Range:           { severity = { min = sev.WARN } }   (WARN and above)
+--                    { severity = { max = sev.INFO } }   (INFO and below)
+--   Explicit list:   { severity = { sev.WARN, sev.INFO } }
+--
+-- Handlers control HOW diagnostics are displayed.
+-- Built-in handlers: "virtual_text", "virtual_lines", "signs", "underline"
+--
+-------------------------------------------------------------------------------
+---- MAPPINGS (default Neovim keymaps, set unconditionally on startup) --------
+-------------------------------------------------------------------------------
+--
+--   ]d       jump to next diagnostic in buffer          vim.diagnostic.jump({count=1})
+--   [d       jump to previous diagnostic in buffer      vim.diagnostic.jump({count=-1})
+--   ]D       jump to last diagnostic in buffer          vim.diagnostic.jump({count=math.huge})
+--   [D       jump to first diagnostic in buffer         vim.diagnostic.jump({count=-math.huge})
+--   <C-w>d   show diagnostic at cursor in float         vim.diagnostic.open_float()
+--   <C-w><C-d>  (same as above)
+--
+-------------------------------------------------------------------------------
+---- FUNCTIONS  ---------------------------------------------------------------
+-------------------------------------------------------------------------------
+--
+-- CONSUMER (reading & displaying):
+--
+--   vim.diagnostic.jump(opts)             jump by count to specific diagnostic
+--   vim.diagnostic.open_float(opts?)      show diagnostics at cursor in a float
+--   vim.diagnostic.show(ns?, bufnr?)      refresh display (triggers handlers)
+--   vim.diagnostic.hide(ns?, bufnr?)      hide diagnostics without removing them
+--   vim.diagnostic.status(bufnr?, opts?)  returns a statusline-friendly string
+--   vim.diagnostic.get(bufnr?, opts?)     returns list of vim.Diagnostic objects
+--   vim.diagnostic.count(bufnr?, opts?)   returns {[severity]=count} table
+--   vim.diagnostic.is_enabled(opts?)      returns true if enabled for buffer/ns
+--   vim.diagnostic.get_namespace(ns)      returns namespace metadata table
+--   vim.diagnostic.get_namespaces()       returns all namespace metadata
+--   vim.diagnostic.setqflist(opts?)       populate quickfix list with diagnostics
+--   vim.diagnostic.setloclist(opts?)      populate location list with diagnostics
+--
+-- PRODUCER FUNCTIONS (creating & managing):
+--
+--   vim.diagnostic.set(ns, bufnr, diagnostics, opts?) set diagnostics for a buffer/namespace
+--   vim.diagnostic.get(bufnr, opts)    (also usable by producers for reads)
+--   vim.diagnostic.reset(ns?, bufnr?)  clear diagnostics for namespace/buffer
+--   vim.diagnostic.enable(bufnr?, opts?)   enable diagnostics (can filter by ns)
+
+
+-------------------------------------------------------------------------------
+---- DIAGNOSTICS CONFIGURATION ------------------------------------------------
+-------------------------------------------------------------------------------
+
 vim.diagnostic.config {
-  update_in_insert = true, -- Update LSP while in insert mode
-  virtual_text = true,     -- Show diagnostics in virtual text
-  severity_sort = true,    -- List important first
-  underline = false,
-  float = { source = 'if_many' },
+  update_in_insert = true,  -- update LSP while in insert mode
+  virtual_text     = true,  -- show text at end of line
+  virtual_lines    = false, -- show diagnostic in its own line
+  severity_sort    = true,  -- list ERROR first
+  underline        = false, -- underline diagnostic range
+  float = { border = 'rounded', source = 'if_many' },
+  jump  = { float = true }, -- Auto open the float after jumping
 }
 
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list', silent = true })
+vim.keymap.set('n', 'gl', vim.diagnostic.open_float, { desc = 'Open diagnostic', silent = true })
+
+
+-------------------------------------------------------------------------------
+---- CUSTOM COMMANDS ----------------------------------------------------------
+-------------------------------------------------------------------------------
+
+-- Snapshot of the settings for the command
+local diag_base_config = vim.diagnostic.config()
+
+-- :Diag none   disable all diagnostics
+-- :Diag error  show errors only
+-- :Diag warn   show errors + warnings
+-- :Diag info   show errors + warnings + info
+-- :Diag hint   show all (errors + warnings + info + hints)
+-- :Diag all    show all (alias for hint)
+local diag_levels = {
+  none  = false,
+  error = vim.diagnostic.severity.ERROR,
+  warn  = vim.diagnostic.severity.WARN,
+  info  = vim.diagnostic.severity.INFO,
+  hint  = vim.diagnostic.severity.HINT,
+  all   = vim.diagnostic.severity.HINT,
+}
+
+vim.api.nvim_create_user_command('Diag', function(args)
+  local level = args.args
+  if diag_levels[level] == false and level ~= 'none' then
+    vim.notify('Diag: unknown level "' .. level .. '"', vim.log.levels.ERROR)
+    return
+  end
+
+  if level == 'none' then
+    vim.diagnostic.enable(false)
+    return
+  end
+
+  vim.diagnostic.enable(true)
+  local min = { min = diag_levels[level] }
+  local config = vim.deepcopy(diag_base_config)  -- always start from the original
+
+  for _, handler in ipairs({ 'signs', 'virtual_text', 'virtual_lines', 'underline', 'float' }) do
+    local existing = config[handler]
+
+    if type(existing) == 'table' then
+      existing.severity = min
+    elseif existing ~= false then
+      config[handler] = { severity = min }
+    end
+  end
+
+  vim.diagnostic.config(config)
+end, {
+  nargs = 1,
+  complete = function()
+    return vim.tbl_keys(diag_levels)
+  end,
+})
+
+
+-------------------------------------------------------------------------------
 ---- SERVER CONFIG ------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- (This is actually the important part)
+--
 -- Enable the following language servers with additional configuration options.
 --
 --   cmd          The command that runs the server.
@@ -324,7 +414,8 @@ vim.lsp.config("*", {
   root_markers = { ".git" },
 })
 
----- Configuration for each LSP server ----
+---- Configuration for each LSP server ----------------------------------------
+---- CLANG ----
 -- C/C++ language server
 -- Fedora package: clang-devel or clang-tools-extra
 vim.lsp.config['clangd'] = {
@@ -333,6 +424,7 @@ vim.lsp.config['clangd'] = {
   root_markers = { 'Makefile', 'CMakeLists.txt', 'compile_commands.json', 'compile_flags.txt' },
 }
 
+---- ZUBAN ----
 -- Python language server
 -- Website: https://zubanls.com/
 -- Installation: pipx install zubanls
@@ -342,19 +434,25 @@ vim.lsp.config['zuban'] = {
   root_markers = { '.git', 'pyproject.toml', 'setup.py' }
 }
 
+---- RUFF ----
+-- Python linter
+vim.lsp.config['ruff'] = {
+  cmd = { 'ruff', 'server' },
+  filetypes = { 'python' },
+  root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', '.git' },
+  settings = {},
+}
+
+---- RUST_ANALYZER ----
 -- Rust language server
 -- Installation: rustup component add rust-analyzer
-vim.lsp.config['rust_analyzer'] = {
+vim.lsp.config['rust'] = {
   cmd = { 'rust-analyzer' },
   filetypes = { 'rust' },
   root_markers = { 'Cargo.toml', '.git' },
-  -- capabilities = {
-  --   experimental = {
-  --     serverStatusNotification = true,
-  --   }
-  -- }
 }
 
+---- OLS ----
 -- Odin language server
 -- Installation: git clone https://github.com/DanielGavin/ols && ./build.sh
 vim.lsp.config['ols'] = {
@@ -371,10 +469,29 @@ vim.lsp.config['ols'] = {
   },
 }
 
+---- LANGUAGE TOOL ----
 -- LanguageTool (spell and grammar checking)
 -- Website: https://ltex-plus.github.io/ltex-plus/index.html
 -- Instalation: manually from Github Releases (https://github.com/ltex-plus/ltex-ls-plus/releases)
 -- Info: https://github.com/neovim/nvim-lspconfig/blob/master/lsp/ltex_plus.lua
+vim.lsp.config['languagetool'] = {
+  cmd = { 'ltex-ls-plus' },
+  filetypes = { 'gitcommit', 'markdown', 'plaintex', 'tex', 'text', 'typst' },
+  root_markers = { '.git' },
+  settings = {
+    ltex = {
+      language = 'es', -- en-US
+      enabled = { 'gitcommit', 'markdown', 'plaintex', 'tex', 'text', 'typst' },
+    },
+  },
+}
 
--- Finally, do a call to 'vim.lsp.enable' with the name of the servers.
-vim.lsp.enable(enabled_servers)
+-- Finally, do a call to 'vim.lsp.enable' with the name of the configurations.
+vim.lsp.enable({
+  'clangd',
+  --'zuban',
+  'ruff',
+  'ols',
+  'rust',
+})
+
