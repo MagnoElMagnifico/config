@@ -1,0 +1,42 @@
+{
+  "Code block": {
+    "prefix": "code",
+    "description": "Create a code block with a specific language",
+    "body": [
+      "```$1",
+      "$0",
+      "```"
+    ]
+  },
+
+  "Note Block": {
+    "prefix": "block",
+    "description": "Shortcode de Hugo para crear un callout",
+    "body": [
+      "{{< block \"${1:Nota}\" \"var(--magno-green)\" >}}",
+      "$0",
+      "{{< /block >}}"
+    ]
+  },
+
+  "Keyvalue Block": {
+    "prefix": "keyvalue",
+    "description": "Shortcode de Hugo para crear una tabla de 2 columnas",
+    "body": [
+      "{{< keyvalue title=\"$1\" key-header=true fill=true >}}",
+      "-% $2 :%",
+      "$0",
+      "{{< /keyvalue >}}"
+    ]
+  },
+
+  "Shortcode": {
+    "prefix": "{{",
+    "description": "Generic Hugo shortcode",
+    "body": [
+      "{{< ${1} >}}",
+      "$0",
+      "{{< /${1} >}}"
+    ]
+  }
+}
