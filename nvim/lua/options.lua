@@ -48,10 +48,9 @@ vim.opt.foldtext = '' -- Text to show on folded sections
 vim.opt.foldlevel = 99 -- No folds closed by default (set to 0 to close all)
 vim.opt.foldnestmax = 4 -- Max fold nesting
 
--- TODO: disable wrapping, encourage semantic line breaks
 -- Formatting options
 vim.opt.textwidth = 100
--- t  Autowrap on textwidth
+-- [t  Autowrap on textwidth]
 -- c  Wrap comments
 -- r  Inside comments, '<Enter>' inserts a new comment
 -- o  Same as before, but with 'o' command
@@ -60,7 +59,7 @@ vim.opt.textwidth = 100
 -- n  Recognize numbered lists ('formatlistpat')
 -- l  Don't format longer lines
 -- j  Remove comment leader when joining lines
-vim.o.formatoptions = 'tcro/qnlj'
+vim.o.formatoptions = 'cro/qnlj'
 
 -- %n Buffer number
 -- %< Truncate text here if no there isn't enough space

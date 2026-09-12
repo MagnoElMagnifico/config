@@ -71,8 +71,8 @@ if #parsers_to_install > 0 then
 end
 
 ---- Start treesitter ----
-local group = vim.api.nvim_create_augroup("TreeSitterConfig", { clear = true })
-vim.api.nvim_create_autocmd("FileType", {
+local group = vim.api.nvim_create_augroup('TreeSitterConfig', { clear = true })
+vim.api.nvim_create_autocmd('FileType', {
   group = group,
   callback = function(args)
     if vim.list_contains(treesitter.get_installed(), vim.treesitter.language.get_lang(args.match)) then

@@ -336,7 +336,6 @@ vim.diagnostic.config {
   severity_sort    = true,  -- list ERROR first
   underline        = false, -- underline diagnostic range
   float = { border = 'rounded', source = 'if_many' },
-  jump  = { float = true }, -- Auto open the float after jumping
 }
 
 vim.keymap.set('n', 'grd', vim.diagnostic.setqflist, { desc = 'Open diagnostic Quickfix list', silent = true })
@@ -415,7 +414,7 @@ end, {
 --                If the same directory is used, we'll use the same server.
 --
 -- This generic configuration ('*') will merged for the with the others
-vim.lsp.config("*", {
+vim.lsp.config('*', {
   capabilities = {
     textDocument = {
       semanticTokens = {
@@ -423,12 +422,11 @@ vim.lsp.config("*", {
       },
     },
   },
-  root_markers = { ".git" },
 })
 
 ---- Configuration for each LSP server ----------------------------------------
----- CLANG ----
--- C/C++ language server
+---- C/C++ ----
+-- clang: C/C++ language server
 -- Fedora package: clang-devel or clang-tools-extra
 vim.lsp.config['clangd'] = {
   cmd = { 'clangd', '--background-index' },
@@ -436,27 +434,37 @@ vim.lsp.config['clangd'] = {
   root_markers = { 'Makefile', 'CMakeLists.txt', 'compile_commands.json', 'compile_flags.txt' },
 }
 
----- ZUBAN ----
--- Python language server
+---- PYTHON ----
+local python_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.venv', '.git' }
+
+-- zuban: Python language server
 -- Website: https://zubanls.com/
 -- Installation: pipx install zubanls
 vim.lsp.config['zuban'] = {
   cmd = { 'zuban', 'server' },
   filetypes = { 'python' },
-  root_markers = { '.git', 'pyproject.toml', 'setup.py' }
+  root_markers = python_markers,
 }
 
----- RUFF ----
--- Python linter
+-- ruff: Python linter and formatter
+-- Installation: pipx install ruff
 vim.lsp.config['ruff'] = {
   cmd = { 'ruff', 'server' },
   filetypes = { 'python' },
-  root_markers = { 'pyproject.toml', 'ruff.toml', '.ruff.toml', '.git' },
-  settings = {},
+  root_markers = { 'ruff.toml', '.ruff.toml', unpack(python_markers) },
 }
 
----- RUST_ANALYZER ----
--- Rust language server
+-- ty: Python type checker
+-- Website: https://docs.astral.sh/ty
+-- Installation: pipx install ty
+vim.lsp.config['ty'] = {
+  cmd = { 'ty', 'server' },
+  filetypes = { 'python' },
+  root_markers = { 'ty.toml', unpack(python_markers) },
+}
+
+---- RUST ----
+-- rust_analyzer: Rust language server
 -- Installation: rustup component add rust-analyzer
 vim.lsp.config['rust'] = {
   cmd = { 'rust-analyzer' },
@@ -464,8 +472,8 @@ vim.lsp.config['rust'] = {
   root_markers = { 'Cargo.toml', '.git' },
 }
 
----- OLS ----
--- Odin language server
+---- Odin ----
+-- ols: Odin language server
 -- Installation: git clone https://github.com/DanielGavin/ols && ./build.sh
 vim.lsp.config['ols'] = {
   cmd = { 'ols' },
@@ -501,9 +509,10 @@ vim.lsp.config['languagetool'] = {
 -- Finally, do a call to 'vim.lsp.enable' with the name of the configurations.
 vim.lsp.enable({
   'clangd',
-  --'zuban',
+  'zuban',
   'ruff',
+  'ty',
   'ols',
-  'rust',
+  --'rust',
 })
 

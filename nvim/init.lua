@@ -7,21 +7,20 @@
 --     completion    Documentation, faster typing, no typos
 --     snippets      Writing faster
 --     Fuzzy finder  Jump to files and locations easily
---     Gitsigns      Git status and hunk management
 --     Mini.nvim     AI              -- tree-sitter operators
 --                   Align, Surround -- automate tedious tasks
 --                   Bracketed       -- easy navigation (conflict markers for git)
 --                   Files           -- netrw moving and coping is annoying
 --                   IndentScope     -- show current scope
 --                   Statusline      -- prettier status line
+--     Gitsigns      Git status and hunk management
 --     GuessIndent   Avoid having to do `:set sw=4 et` every time
 --     Colorschemes  Onedark
 --
 -- TODO:
 --
 --   - Formatting    Consistent format and avoid tedious tasks
---   - ToggleTerm    Faster terminal handling
---   - todo-comments Highlight TODO comments and similar
+--     The biggest problem is finding the right formatter configuration.
 --
 -------------------------------------------------------------------------------
 --
@@ -45,7 +44,6 @@ vim.g.loaded_node_provider = 0
 
 -- Disable builtin plugins
 -- See which ones are being loaded with :scriptnames
--- TODO: decide which ones to remove
 --vim.g.loaded_tutor_mode_plugin = 1
 --vim.g.loaded_zip = 1
 --vim.g.loaded_zipPlugin = 1
@@ -65,6 +63,48 @@ require 'options'  -- Most basic settings
 require 'keymaps'  -- Basic keybindings
 require 'commands' -- General auto-commands and user commands
 require 'lsp'      -- Language Server mappings, autocommands and configuration
+require 'case_convert'
+
+-------------------------------------------------------------------------------
+---- Third party plugins configuration ----------------------------------------
+-------------------------------------------------------------------------------
+
+-- TODO: document 'runtimepath' and configuration files
+
+vim.pack.add({
+  -- Plugins
+  'https://github.com/ibhagwan/fzf-lua',
+  'https://github.com/lewis6991/gitsigns.nvim',
+  'https://github.com/NMAC427/guess-indent.nvim',
+  'https://github.com/nvim-mini/mini.nvim',
+  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', branch = 'main', build = ':TSUpdate' },
+  { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range('1.x') }, -- Rewritting for V2
+
+  -- setup.style = dark, darker, cool, deep, warm, warmer, light
+  'https://github.com/navarasu/onedark.nvim',
+
+  -- :colorscheme drakula, drakula-soft
+  --'https://github.com/Mofiqul/dracula.nvim',
+  -- vim.g.sonokai_style = default, atlantis, andromeda, shusia, maia, espresso
+  --'https://github.com/sainnhe/sonokai',
+  -- :colorscheme tokyonight tokyonight-night tokyonight-storm tokyonight-day tokyonight-moon
+  --'https://github.com/folke/tokyonight.nvim',
+  --{ src = 'https://github.com/catppuccin/nvim', name = 'catppuccin' },
+
+  'https://github.com/otavioschwanck/arrow.nvim',
+})
+
+require 'extra.treesitter' -- nvim-treesitter
+require 'extra.finder'     -- fzf-lua
+require 'extra.completion' -- blink
+require 'extra.mini'       -- mini.ai, mini.surround, mini.align, mini.bracketed, mini.files, mini.statusline
+require 'extra.git'        -- gitsigns
+
+local ok, guess = pcall(require, 'guess-indent')
+if ok then guess.setup() end
+
+local ok, arrow = pcall(require, 'arrow')
+if ok then arrow.setup({ show_icons = true, leader_key = '-', buffer_leader_key = 'm' }) end
 
 -------------------------------------------------------------------------------
 ---- Builtin plugins configuration --------------------------------------------
@@ -96,43 +136,6 @@ vim.cmd.packadd 'nohlsearch'
 --vim.cmd.packadd 'difftool'
 
 -------------------------------------------------------------------------------
----- Third party plugins configuration ----------------------------------------
--------------------------------------------------------------------------------
-
--- TODO: document 'runtimepath' and configuration files
-
-vim.pack.add({
-  -- Plugins
-  'https://github.com/ibhagwan/fzf-lua',
-  'https://github.com/lewis6991/gitsigns.nvim',
-  'https://github.com/NMAC427/guess-indent.nvim',
-  'https://github.com/nvim-mini/mini.nvim',
-  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', branch = 'main', build = ':TSUpdate' },
-  { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range('1.x') }, -- Rewritting for V2
-
-  -- setup.style = dark, darker, cool, deep, warm, warmer, light
-  'https://github.com/navarasu/onedark.nvim',
-
-  -- :colorscheme drakula, drakula-soft
-  --'https://github.com/Mofiqul/dracula.nvim',
-  -- vim.g.sonokai_style = default, atlantis, andromeda, shusia, maia, espresso
-  --'https://github.com/sainnhe/sonokai',
-  -- :colorscheme tokyonight tokyonight-night tokyonight-storm tokyonight-day tokyonight-moon
-  --'https://github.com/folke/tokyonight.nvim',
-})
-
-require 'extra.treesitter' -- nvim-treesitter
-require 'extra.finder'     -- fzf-lua
-require 'extra.completion' -- blink
-require 'extra.mini'       -- mini.ai, mini.surround, mini.align, mini.bracketed, mini.files, mini.statusline
-require 'extra.git'        -- gitsigns
-
-local ok, guess = pcall(require, 'guess-indent')
-if ok then
-  guess.setup()
-end
-
--------------------------------------------------------------------------------
 ---- Color scheme -------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- Preferred builtin colorchemes:  habamax, sorbet, unokai
@@ -140,7 +143,7 @@ end
 -- Light themes:                   tokyonight-day, onelight
 local ok, onedark = pcall(require, 'onedark')
 if ok then
-  onedark.setup({ style = 'darker' })
+  onedark.setup({ style = 'dark' })
   onedark.load()
 else
   -- fallback

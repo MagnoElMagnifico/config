@@ -46,7 +46,7 @@ vim.api.nvim_create_user_command('Size', function(args)
       return nil
     end
 
-    local percent = value:match("^%%(%d+)$")
+    local percent = value:match('^%%(%d+)$')
     if percent then
       return math.max(1, math.floor(tonumber(percent) / 100 * max))
     end
@@ -88,9 +88,9 @@ end, {
 vim.api.nvim_create_user_command('Go', function(args)
   local line, col
 
-  -- Accept: "line", "line col", "line:col"
+  -- Accept: 'line', 'line col', 'line:col'
   if #args.fargs == 1 then
-    line, col = args.fargs[1]:match("^(%d+)%D?(%d*)$")
+    line, col = args.fargs[1]:match('^(%d+)%D?(%d*)$')
     col = tonumber(col) or vim.fn.col('.')
   elseif #args.fargs == 2 then
     line = args.fargs[1]

@@ -344,7 +344,7 @@ setup('mini.statusline', {
       end
 
       local fileinfo = MiniStatusline.section_fileinfo({ trunc_width = 120 })
-      fileinfo = string.gsub(fileinfo, "(%S+)%s+(%S+)%s+(%S+)", "%1 | %2 | %3")
+      fileinfo = string.gsub(fileinfo, '(%S+)%s+(%S+)%s+(%S+)', '%1 | %2 | %3')
 
       --- RIGHT MAIN GROUP: line | column ---
       local location = MiniStatusline.section_location({ trunc_width = math.huge })

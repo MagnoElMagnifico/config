@@ -24,29 +24,6 @@
 --
 -- TODO: complete documentation
 --
--- MAPPINGS (inside search UI):
---    <F1>    Help
---    <F2>    Toggle fullscreen
---    <F3>    Toggle wrap lines in preview
---    <F4>    Toggle preview
---    <F5>    Cycle windows
---
---    <A-i>   Toggle ignore
---    <A-h>   Toggle hidden
---
---    <A-g>   Select first
---    <A-G>   Select last
---    <C-f>   Select forward in list
---    <C-b>   Select backward in list
---    <A-S-Up>   Scroll preview
---    <A-S-Down> Scroll preview
---    <C-e>   End of line
---    <C-a>   Start of line
---
---    <C-s>   Open in horizontal split
---    <C-v>   Open in vertical split
---    <C-t>   Open in tab
---
 
 local ok, fzf = pcall(require, 'fzf-lua')
 if not ok then
@@ -55,7 +32,57 @@ if not ok then
 end
 
 -- Default configuration
-fzf.setup({})
+fzf.setup({
+    keymap = {
+      builtin = {
+        ['<C-q>']       = 'hide',
+        ['<F1>']        = 'toggle-help',
+
+        -- preview
+        ['<F2>']        = 'toggle-fullscreen',
+        ['<F3>']        = 'toggle-preview',
+        ['<F4>']        = 'toggle-preview-cw',       -- cycle windows
+        ['<F5>']        = 'toggle-preview-wrap',     -- wrap text in preview
+        ['<F6>']        = 'toggle-preview-behavior', -- ???
+        ['<F7>']        = 'toggle-preview-ts-ctx',   -- treesitter
+        ['<F8>']        = 'preview-ts-ctx-dec',      -- treesitter
+        ['<F9>']        = 'preview-ts-ctx-inc',      -- treesitter
+        ['<S-Left>']    = 'preview-reset',
+        ['<S-Down>']    = 'preview-page-down',
+        ['<S-Up>']      = 'preview-page-up',
+        ['<C-S-Down>']  = 'preview-down',
+        ['<C-S-Up>']    = 'preview-up',
+      },
+      fzf = {
+        ['ctrl-z']      = 'abort',
+        ['ctrl-u']      = 'unix-line-discard',
+        ['ctrl-f']      = 'half-page-down',
+        ['ctrl-b']      = 'half-page-up',
+        ['ctrl-a']      = 'beginning-of-line',
+        ['ctrl-e']      = 'end-of-line',
+        ['ctrl-space']  = 'toggle-all',           -- was alt-a
+        ['home']        = 'first',                -- was alt-g
+        ['end']         = 'last',                 -- was alt-G
+        ['f3']          = 'toggle-preview',
+        ['f5']          = 'toggle-preview-wrap',
+        ['shift-down']  = 'preview-page-down',
+        ['shift-up']    = 'preview-page-up',
+      },
+    },
+    actions = {
+      files = {
+        ['enter']       = FzfLua.actions.file_edit_or_qf,
+        ['ctrl-s']      = FzfLua.actions.file_split,
+        ['ctrl-v']      = FzfLua.actions.file_vsplit,
+        ['ctrl-t']      = FzfLua.actions.file_tabedit,
+        ['ctrl-q']      = FzfLua.actions.file_sel_to_qf,     -- was alt-q
+        ['ctrl-l']      = FzfLua.actions.file_sel_to_ll,     -- was alt-Q
+        ['f10']         = FzfLua.actions.toggle_ignore,      -- was alt-i
+        ['f11']         = FzfLua.actions.toggle_hidden,      -- was alt-h
+        ['f12']         = FzfLua.actions.toggle_follow,      -- was alt-f
+      },
+    },
+})
 
 local function nmap(mapping, mapped, desc)
   vim.keymap.set('n', mapping, mapped, { desc = desc, silent = true })
